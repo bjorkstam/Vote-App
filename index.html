@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <title>Vote App</title>
+	
+	<style>
+	* {
+	    margin:0;
+	    padding:0;
+	}
+    html, body {
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        width: 100%;
+        height: 100%;
+    }
+    section {
+        display: block;
+        float:left;
+        height: 100%;
+        text-align: center;
+        margin:0;
+        padding:0;
+    }
+    
+    #container {
+        transition: all .25s ease-in;
+        -moz-transition: all .25s ease-in;
+        -webkit-transition: all .25s ease-in;
+        height: 100%;
+
+        background: #fcf9f9; /* Old browsers */
+        background: -moz-linear-gradient(top, #fcf9f9 0%, #f2f2f2 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fcf9f9), color-stop(100%,#f2f2f2)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top, #fcf9f9 0%,#f2f2f2 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top, #fcf9f9 0%,#f2f2f2 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top, #fcf9f9 0%,#f2f2f2 100%); /* IE10+ */
+        background: linear-gradient(top, #fcf9f9 0%,#f2f2f2 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcf9f9', endColorstr='#f2f2f2',GradientType=0 ); /* IE6-9 */
+
+        color: #333;
+        text-shadow: -2px -2px 1px white;
+
+    }
+    </style>
+    </head>
+    <body>
+    <div id="container"></div>
+    <script>
+    (function() {
+        var cards = ["?", "0", "&#189;", "1", "2", "3", "5", "8", "13", "20","40", "100"],
+            container = document.getElementById('container'),
+            tmpElem,
+            docWidth = document.body.clientWidth,
+            docHeight = document.body.clientHeight,
+            fontSize = ~~((docHeight < docWidth ? docHeight : docWidth) * .9),
+            tmpSize,
+            move = docWidth,
+            maxwidth = move * cards.length,
+            screenOffset = 0,
+            i;
+
+        for (i=0; i < cards.length; i++) {
+            tmpElem = document.createElement('section');
+            tmpElem.innerHTML = "<span>" + cards[i] + "</span>";
+            tmpElem.style.width = docWidth + "px";
+            
+            tmpSize = fontSize;
+            
+            if (i > 10) {
+                tmpSize = ~~(fontSize * .70);
+            } else if (i > 7) {
+                tmpSize = ~~(fontSize * .85);
+            }
+            
+            tmpElem.style.fontSize = tmpSize + "px";
+            
+            tmpElem.style.lineHeight = docHeight + "px";
+            
+            container.appendChild(tmpElem);
+        }
+
+        container.style.width = cards.length * docWidth + "px";
+
+
+        /* Handle finger swipes on touch devices */
+
+        var touchTracker = {
+            click: 0,
+            diff: 0,
+            offset: 50,
+            init: function(newX) {
+                this.click = newX;
+                this.diff = 0;
+            },
+            track: function(newX) {
+                this.diff = this.click - newX;
+            },
+            move: function() {
+                if (this.diff > this.offset) {
+                    this.moveRight();
+                } else if (this.diff < -this.offset) {
+                    this.moveLeft();
+                }
+            },
+            moveRight: function() {
+                screenOffset -= move;
+                if (screenOffset <= -maxwidth) screenOffset = 0;
+                container.style.marginLeft = screenOffset + "px";
+            },
+            moveLeft: function() {
+                screenOffset += move;
+                if (screenOffset >= move) screenOffset = move-maxwidth;
+                container.style.marginLeft = screenOffset + "px";
+            }
+        }
+
+
+        document.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            touchTracker.init(e.touches[0].screenX);
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            touchTracker.track(e.touches[0].screenX);
+        });
+        document.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            touchTracker.move();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 37) {
+                touchTracker.moveLeft();
+            } else if (e.keyCode === 39) {
+                touchTracker.moveRight();
+            }
+        });
+    })();
+    
+    </script>
+    </body>
+</html>
